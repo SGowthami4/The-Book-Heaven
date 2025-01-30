@@ -4,6 +4,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const { log } = require("console");
 
 const app = express();
 app.use(express.json());
@@ -59,7 +60,7 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.post("/register", async (req, res) => {
-  const { } = req.body;
+  const {username,password,email,role } = req.body;
   try {
     const hashedPassword = await bcrypt.hash(password, 10); // 10-tells how many times the hashing algorithm is performed.
     console.log("hashed password is", hashedPassword);
@@ -170,12 +171,12 @@ app.post("/rentingBook", async (req, res) => {
 });
 app.get('/users/:user_id', async (req, res) => {
   try {
-    const userId = parseInt(req.params.user_id); // Fixed param name
+    const userId = parseInt(req.params.user_id); 
     if (!userId || isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID format" });
     }
     await client.connect();
-    const result = await client.query(`SELECT * FROM users WHERE user_id=$1;`, [userId]); // Use parameterized queries
+    const result = await client.query(`SELECT * FROM users WHERE user_id=$1;`, [userId]); 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -185,8 +186,33 @@ app.get('/users/:user_id', async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+app.get('/rentedDetails',async(req,res)=>{
+  try{
+    // await client.connect();
+    const rentedBooks=await client.query('select users.user_id,users.username,renteddetails.s_no,renteddetails.book_id,renteddetails.rented_book,renteddetails.rental_date,renteddetails.returned,renteddetails.returned_date,renteddetails.rental_quantity from users Inner join renteddetails on renteddetails.user_id=users.user_id;')
+    res.status(200).json({"rentedBooks":rentedBooks.rows})
+  }catch(err){
+    console.error("Error executing query", err.stack)
+  }finally{
+    // await client.end();
+  }
+})
+app.put('/rentedDetails/:user_id',async(req,res)=>{
+  const changedValues=req.body;
+  try{
+    const { s_no, ...rest } = changedValues;
+    Object.entries(rest).forEach(([key, value]) => {
+      const changingValues=client.query(`Update renteddetails set ${key}=${value} where s_no=${s_no};`)
+    });
+        res.status(200).json({"rentedBooks":rentedBooks.rows})
 
-
+  }catch(err){
+    console.error("Error executing query", err.stack)
+  }finally{
+    // await client.end();
+  }
+  
+})
 app.listen(PORT, () => {
   console.log("Server is running");
 }); 

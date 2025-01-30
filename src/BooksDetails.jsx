@@ -70,7 +70,7 @@ export default function BooksDetails() {
         return;
       }
       const userData = await userResponse.json();
-      const username = userData.name;
+      const username = userData.username;
       console.log(userData);
       
       // Send POST request to rent a book
@@ -83,11 +83,7 @@ export default function BooksDetails() {
       });
 
       if (response.ok) {
-        setRenterDetails((prevState) => ({
-          ...prevState,
-          rental_status: true, 
-        }));
-  
+        setRenterDetails({...renterDetails,rental_status:true})  
         setRentedMessage(`Success! ${username} has rented "${renterDetails.rented_book}".`);
       } else {
         setRentedMessage("Renting failed. Please try again.");
@@ -95,7 +91,7 @@ export default function BooksDetails() {
 
       setTimeout(() => {
         setRentedMessage("");
-      }, 60000);
+      }, 5000);
     } catch (error) {
       console.error("Error during renting process:", error);
       setRentedMessage("An error occurred. Please try again.");
@@ -157,9 +153,9 @@ export default function BooksDetails() {
                             <Label htmlFor="book_id">Book ID</Label>
                             <Input
                               id="book_id"
-                              value={book.book_id}
+                              value={renterDetails.book_id}
                               onChange={(e) =>
-                                setRenterDetails({ ...renterDetails,book_id:`${book.book_id}`})
+                                setRenterDetails({ ...renterDetails,book_id:e.target.value})
                               }                              className="col-span-2 h-8"
                              
                             />
@@ -168,9 +164,9 @@ export default function BooksDetails() {
                             <Label htmlFor="rented_book">Book</Label>
                             <Input
                               id="rented_book"
-                              value={book.title}
+                            value={renterDetails.rented_book}
                               onChange={(e) =>
-                                setRenterDetails({ ...renterDetails,rented_book: `${book.title}`})
+                                setRenterDetails({ ...renterDetails,rented_book:e.target.value})
                               }                              className="col-span-2 h-8"
                              
                             />

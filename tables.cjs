@@ -26,7 +26,7 @@ app.use(cors());
 
 // async function tables(){
 // await client.connect()
-// const book=await client.query("create table books(book_id SERIAL PRIMARY KEY,ISBN varchar(100),title varchar(100),author varchar(100),genre varchar(100),pages int,language varchar(100),no_of_copies_rented int,no_of_copies_available int,Total_copies int,price decimal,rented_status boolean,rented_date boolean);")
+// const book=await client.query("create table books(book_id SERIAL PRIMARY KEY,ISBN varchar(100),title varchar(100),author varchar(100),genre varchar(100),pages int,language varchar(100),no_of_copies_rented int,no_of_copies_available int,Total_copies int,price decimal);")
 // console.log(book);
 // await client.end()
 
@@ -47,8 +47,8 @@ app.use(cors());
 
 
 
-// // Read the JSON file
-// fs.readFile('./booksInfo.json', 'utf8', async(err, data) => {
+// // // Read the JSON file
+// fs.readFile('./booksInfo.json', 'utf8', (err, data) => {
 //   if (err) {
 //     console.error('Error reading the file:', err);
 //     return;
@@ -78,7 +78,7 @@ app.use(cors());
 //       book.Total_copies,
 //       book.price,
 //     ]);
-//    client.end()
+//   //  client.end()
    
 //   });
 // });

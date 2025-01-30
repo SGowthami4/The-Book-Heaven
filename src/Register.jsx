@@ -18,7 +18,6 @@ export default function Register({setNewUser}) {
   const [form, setform] = useState({ username: "", password: "", role: "" ,email:""});
   const [message, setMessage] = useState("");
   const [registered,setRegistered]=useState(false)
-
   const handleRegistration = async (e) => {
     setRegistered(true)
     if (!form.username || !form.password || !form.role || !form.email) {
