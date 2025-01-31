@@ -29,7 +29,6 @@ export default function BooksDetails() {
     rental_status: false, 
     rental_quantity: 1,
   });
-  
   const [rentedMessage, setRentedMessage] = useState("");
   const navigate = useNavigate();
 
@@ -101,6 +100,9 @@ export default function BooksDetails() {
   return (
     <div>
       {rentedMessage && <Alert>{rentedMessage}</Alert>}
+      <div className="flex justify-end">
+      <Button onClick={()=>navigate('/admin')}>Back</Button>
+      </div>
       {books.length > 0 ? (
         <Table>
           <TableCaption>Books for rent</TableCaption>

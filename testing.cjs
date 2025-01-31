@@ -121,7 +121,7 @@ app.get('/userPage',(req,res)=>{
 })
 app.get('/getAllUsers',authenticateToken,authorizeRole('Admin'),async(req,res)=>{
   try{
-    const fetchingUsers=await client.query('select * from users;')
+    const fetchingUsers=await client.query(`select * from users where role!='Admin';`)
     res.status(200).json({allUsers:fetchingUsers.rows})
   }catch(err){
     console.error("Error executing query", err.stack)
@@ -140,8 +140,17 @@ app.get('/books',authenticateToken,async(req,res)=>{
     // await client.end();
   }
 })
-app.get("/user", authenticateToken, (req, res) => {
-  res.json({ message: 'Welcome to admin page' });
+app.get("/user", authenticateToken, async(req, res) => {
+  // console.log(`userId:${user.user_id}`);
+  const userId=user.user_id;
+  try{
+
+    const userRentedBooks=await client.query(`select books.title,books.author,books.genre,books.pages,books.language,books.no_of_copies_available,books.price,renteddetails.rental_date
+  From renteddetails inner join books on renteddetails.book_id=books.book_id where renteddetails.user_id=${userId}; `)
+    res.json({ rentedBooks:userRentedBooks.rows});
+  }catch (error) {
+    console.log(error);
+  }
 });
 app.get("/admin", authenticateToken,authorizeRole("Admin"), (req, res) => {
   let adminId=req.user.userId;
@@ -190,6 +199,7 @@ app.get('/rentedDetails',async(req,res)=>{
   try{
     // await client.connect();
     const rentedBooks=await client.query('select users.user_id,users.username,renteddetails.s_no,renteddetails.book_id,renteddetails.rented_book,renteddetails.rental_date,renteddetails.returned,renteddetails.returned_date,renteddetails.rental_quantity from users Inner join renteddetails on renteddetails.user_id=users.user_id;')
+    // console.log(rentedBooks);
     res.status(200).json({"rentedBooks":rentedBooks.rows})
   }catch(err){
     console.error("Error executing query", err.stack)
@@ -199,12 +209,18 @@ app.get('/rentedDetails',async(req,res)=>{
 })
 app.put('/rentedDetails/:user_id',async(req,res)=>{
   const changedValues=req.body;
+  console.log(changedValues);
+  const returnedDate = changedValues.returned_date ? `'${changedValues.returned_date}'` : 'NULL';
+
   try{
-    const { s_no, ...rest } = changedValues;
-    Object.entries(rest).forEach(([key, value]) => {
-      const changingValues=client.query(`Update renteddetails set ${key}=${value} where s_no=${s_no};`)
-    });
-        res.status(200).json({"rentedBooks":rentedBooks.rows})
+    const changes=await client.query(`Begin;
+      Update renteddetails set user_id=${changedValues.user_id},book_id=${changedValues.book_id},rented_book='${changedValues.rented_book}',rental_quantity=${changedValues.rental_quantity},returned=${changedValues.returned},returned_date =${returnedDate}
+ where s_no=${changedValues.s_no};
+      update books set no_of_copies_rented=(select no_of_copies_rented from books where book_id=${changedValues.book_id})+${changedValues.rental_quantity},no_of_copies_available=(select total_copies from books where book_id=${changedValues.book_id})-${changedValues.rental_quantity} where book_id=${changedValues.book_id}`)
+        res.status(200).json({message:"Updated successfully"})
+      await client.query('Commit')
+        // console.log(changes);
+        
 
   }catch(err){
     console.error("Error executing query", err.stack)

@@ -1,26 +1,17 @@
-import React from 'react'
-import { useEffect } from 'react'
-import { useState } from 'react'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Select, SelectTrigger, SelectContent, SelectGroup, SelectLabel, SelectItem, SelectValue } from "@/components/ui/select";
-import { Label } from './components/ui/label';
-import { Input } from './components/ui/input';
-import { Alert } from './components/ui/alert';
 import { Button } from './components/ui/button';
 import { Popover, PopoverContent } from './components/ui/popover';
 import { PopoverTrigger } from '@radix-ui/react-popover';
+import { useState, useEffect } from 'react';
+import { Alert } from './components/ui/alert';
+import { Table,TableBody,TableHeader,TableRow,TableCell,TableHead,TableCaption } from './components/ui/table';
+import { Label } from './components/ui/label';
+import { Input } from './components/ui/input';
+import {useNavigate} from 'react-router-dom'
 export default function RentedBooks() {
-  const [rentedInfo,setRentedInfo]=useState([])
-  const [updateDetails,setUpdateDetails]=useState({})
+  const [rentedInfo, setRentedInfo] = useState([]);
+  const [updateDetails, setUpdateDetails] = useState({});
   const [refresh, setRefresh] = useState(false);
+  const navigate=useNavigate()
 
   useEffect(() => {
     const fetchingInfo = async () => {
@@ -35,7 +26,7 @@ export default function RentedBooks() {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        setRentedInfo(data.rentedBooks );
+        setRentedInfo(data.rentedBooks);
       } catch (error) {
         console.log(error);
       }
@@ -43,12 +34,9 @@ export default function RentedBooks() {
     fetchingInfo();
   }, [refresh]);
 
-  
-  const handleEdit = async () => {
-    if (!updateDetails) return;
-
+  const handleEdit = async (entry) => {
     try {
-      const response = await fetch(`http://localhost:3005/rentedDetails/${rentedInfo.user_id}`, {
+      const response = await fetch(`http://localhost:3005/rentedDetails/${entry.user_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -61,24 +49,27 @@ export default function RentedBooks() {
         throw new Error(`Failed to update rental details`);
       }
 
-      
       setRentedInfo((prev) =>
-        prev.map((entry) =>
-          entry.user_id === updateDetails.user_id ? { ...entry, ...updateDetails } : entry
-        )
+        prev.map((item) => (item.user_id === entry.user_id ? { ...item, ...updateDetails } : item))
       );
-      
-      setRefresh(true)
+
+      setRefresh(!refresh);
       setUpdateDetails({});
+      alert("Rental details updated successfully!");
     } catch (error) {
       console.error("Error updating rental details:", error);
     }
   };
 
-
   return (
     <div>
-      {/* {rentedMessage && <Alert>{rentedMessage}</Alert>} */}
+          <div className='flex justify-end'>
+            <Button onClick={()=>navigate('/admin')}>Back</Button>
+          </div>
+          <header>
+
+        <h1 className='font-medium m-4 text-4xl'>Rental Details</h1>
+          </header>
       {rentedInfo.length > 0 ? (
         <Table>
           <TableCaption>Rental Details</TableCaption>
@@ -86,7 +77,7 @@ export default function RentedBooks() {
             <TableRow>
               <TableHead>Entry No</TableHead>
               <TableHead>User ID</TableHead>
-              <TableHead>username</TableHead>
+              <TableHead>Username</TableHead>
               <TableHead>Book ID</TableHead>
               <TableHead>Book Name</TableHead>
               <TableHead>Quantity</TableHead>
@@ -96,20 +87,19 @@ export default function RentedBooks() {
             </TableRow>
           </TableHeader>
           <TableBody>
-          {rentedInfo.map((entry)=>(
-            
-            <TableRow key={entry.s_no}>
-              <TableCell>{entry.s_no}</TableCell>
-             <TableCell>{entry.user_id}</TableCell>
-              <TableCell>{entry.username}</TableCell>
-              <TableCell>{entry.book_id}</TableCell>
-              <TableCell>{entry.rented_book}</TableCell>
-              <TableCell>{entry.rental_quantity}</TableCell>
-              <TableCell>{entry.rental_date}</TableCell>
-              <TableCell>{entry.returned===null?'NO':"YES"}</TableCell>
-              <TableCell>{entry.returned_date===null?'-':`${entry.returned_date}`}</TableCell>
-              <TableCell>
-              <Popover>
+            {rentedInfo.map((entry) => (
+              <TableRow key={entry.s_no}>
+                <TableCell>{entry.s_no}</TableCell>
+                <TableCell>{entry.user_id}</TableCell>
+                <TableCell>{entry.username}</TableCell>
+                <TableCell>{entry.book_id}</TableCell>
+                <TableCell>{entry.rented_book}</TableCell>
+                <TableCell>{entry.rental_quantity}</TableCell>
+                <TableCell>{entry.rental_date}</TableCell>
+                <TableCell>{entry.returned === null ? 'NO' : 'YES'}</TableCell>
+                <TableCell>{entry.returned_date === null ? '' : entry.returned_date}</TableCell>
+                <TableCell>
+                  <Popover>
                     <PopoverTrigger asChild>
                       <Button>Rent</Button>
                     </PopoverTrigger>
@@ -118,128 +108,33 @@ export default function RentedBooks() {
                         <div className="space-y-2">
                           <p className="text-sm text-muted-foreground">Edit details</p>
                         </div>
-                        <div className="grid grid-cols-3 items-center gap-4">
-  <Label htmlFor="s_no">Entry No</Label>
-  <Input
-    id="s_no"
-    value={updateDetails?.s_no}
-    onChange={(e) =>
-      setUpdateDetails((prev) => ({
-        ...prev,
-        s_no: entry.s_no,  // Make sure s_no is always set
-      }))
-    }
-    className="col-span-2 h-8"
-  />
-</div>
-
-                          <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="user_id">UserId</Label>
+                        {Object.keys(entry).map((key) => (
+                          <div key={key} className="grid grid-cols-3 items-center gap-4">
+                            <Label htmlFor={key}>{key.replace('_', ' ')}</Label>
                             <Input
-                              id="user_id"
-                              value={updateDetails?.user_id ?? entry.user_id}
-
-                              type="number"
+                              id={key}
+                              value={updateDetails[key] }
+                              type={key==='returned_date'?'date':''}
                               onChange={(e) =>
-                                setUpdateDetails((prev) => ({ ...prev, user_id: e.target.value }))
-                              }                              className="col-span-2 h-8"
+                                setUpdateDetails((prev) => ({ ...prev, [key]: e.target.value }))
+                              }
+                              className="col-span-2 h-8"
+                              disabled={key==="rental_date"}
                             />
                           </div>
-                          <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="user_name">UserName</Label>
-                            <Input
-                              id="user_name"
-                              value={updateDetails?.username ?? entry.username}
-
-                              onChange={(e) =>
-                                setUpdateDetails((prev) => ({ ...prev, username: e.target.value }))
-                              }                              className="col-span-2 h-8"
-                            />
-                          </div>
-                          <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="book_id">Book ID</Label>
-                            <Input
-                              id="book_id"
-                              value={updateDetails?.book_id ?? entry.book_id}
-
-                              onChange={(e) =>
-                                setUpdateDetails((prev) => ({ ...prev, book_id: e.target.value }))
-                              }                              className="col-span-2 h-8"
-                             
-                            />
-                          </div>
-                          <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="rented_book">Book Name</Label>
-                            <Input
-                              id="rented_book"
-                              value={updateDetails?.rented_book ?? entry.rented_book}
-
-                              onChange={(e) =>
-                                setUpdateDetails((prev) => ({ ...prev, rented_book: e.target.value }))
-                              }                              className="col-span-2 h-8"
-                             
-                            />
-                          </div>
-                          <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="rental_quantity">Quantity</Label>
-                            <Input
-                              id="rental_quantity"
-                              type="number"
-                             value={updateDetails?.rental_quantity ?? entry.rental_quantity}
-
-                              onChange={(e) =>
-                                setUpdateDetails((prev) => ({ ...prev, rental_quantity: e.target.value }))
-                              }                              className="col-span-2 h-8"
-                              min="1"
-                            />
-                          </div>
-                          <div className="grid grid-cols-3 items-center gap-4">
-                          <Select
-  value={updateDetails?.returned !== undefined ? String(updateDetails.returned) : (entry.returned ? "true" : "false")}
-  onValueChange={(value) =>
-    setUpdateDetails((prev) => ({ ...prev, returned: value === "true" }))
-  }
->
-  <SelectTrigger className="w-[180px]">
-    <SelectValue />
-  </SelectTrigger>
-  <SelectContent>
-    <SelectGroup>
-      <SelectLabel>Return status</SelectLabel>
-      <SelectItem value="true">Yes</SelectItem>
-      <SelectItem value="false">No</SelectItem>     
-    </SelectGroup>
-  </SelectContent>
-</Select>
-
-                          </div>
-                          <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="returned_date">Returned Date</Label>
-                            <Input
-                              id="returned_date"
-                              type='date'
-                              value={updateDetails?.returned_date ?? entry.returned_date?? ""}
-
-                              onChange={(e) =>
-                                setUpdateDetails((prev) => ({ ...prev, returned_date: e.target.value || null  }))
-                              }                              className="col-span-2 h-8"
-                             
-                            />
-                          </div>
-                        </div>
-                        
-                        <Button onClick={handleEdit}>Save</Button>
-                      
+                        ))}
+                      </div>
+                      <Button onClick={() => handleEdit(entry)}>Save</Button>
                     </PopoverContent>
-                </Popover>
-              </TableCell>
-          </TableRow>
-          ))}
+                  </Popover>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       ) : (
         <Alert>Loading...</Alert>
-        )   }
+      )}
     </div>
-  )
+  );
 }
