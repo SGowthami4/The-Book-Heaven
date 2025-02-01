@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
+import { Select,SelectTrigger,SelectItem,SelectValue,SelectGroup,SelectContent } from './components/ui/select';
 
 export default function Register({setNewUser}) {
   const [form, setform] = useState({ username: "", password: "", role: "" ,email:""});
@@ -93,12 +93,24 @@ export default function Register({setNewUser}) {
                 <Label htmlFor="role" className=" flex justify-items-start">
                   Role
                 </Label>
-                <Input
-                  id="role"
-                  placeholder="Admin/User"
+                <Select
                   value={form.role}
-                  onChange={(e) => setform({ ...form, role: e.target.value })}
-                />
+                  onValueChange={(value) => (
+                    console.log(value),
+                    setform({ ...form, role: value })
+                  )}
+                  id="role"
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="user">User</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
             <CardFooter>

@@ -9,7 +9,18 @@ import { Input } from './components/ui/input';
 import {useNavigate} from 'react-router-dom'
 export default function RentedBooks() {
   const [rentedInfo, setRentedInfo] = useState([]);
-  const [updateDetails, setUpdateDetails] = useState({});
+  const [popOverOpen,setPopOverOpen]=useState(false)
+  const [updateDetails, setUpdateDetails] = useState({
+    s_no:'',
+    user_id:'',
+    username:'',
+    book_id:'',
+    rented_book:'',
+    rental_quantity:'',
+    rental_date:'',
+    returned :false,
+    returned_date:''
+  });
   const [refresh, setRefresh] = useState(false);
   const navigate=useNavigate()
 
@@ -34,7 +45,13 @@ export default function RentedBooks() {
     fetchingInfo();
   }, [refresh]);
 
-  const handleEdit = async (entry) => {
+  const handleEditClick = (entry) => {
+    setPopOverOpen(true)
+    setUpdateDetails(entry); 
+  };
+  
+
+  const handleSave = async (entry) => {
     try {
       const response = await fetch(`http://localhost:3005/rentedDetails/${entry.user_id}`, {
         method: "PUT",
@@ -53,16 +70,18 @@ export default function RentedBooks() {
         prev.map((item) => (item.user_id === entry.user_id ? { ...item, ...updateDetails } : item))
       );
 
-      setRefresh(!refresh);
+      setRefresh(true);
+      setPopOverOpen(false)
       setUpdateDetails({});
       alert("Rental details updated successfully!");
+      setRefresh(false)
     } catch (error) {
       console.error("Error updating rental details:", error);
     }
   };
 
   return (
-    <div>
+    <div  className=''>
           <div className='flex justify-end'>
             <Button onClick={()=>navigate('/admin')}>Back</Button>
           </div>
@@ -95,15 +114,15 @@ export default function RentedBooks() {
                 <TableCell>{entry.book_id}</TableCell>
                 <TableCell>{entry.rented_book}</TableCell>
                 <TableCell>{entry.rental_quantity}</TableCell>
-                <TableCell>{entry.rental_date}</TableCell>
-                <TableCell>{entry.returned === null ? 'NO' : 'YES'}</TableCell>
-                <TableCell>{entry.returned_date === null ? '' : entry.returned_date}</TableCell>
+                <TableCell>{new Date(entry.rental_date).toLocaleDateString("en-GB")}</TableCell>
+                <TableCell>{entry.returned === false ? 'NO' : 'YES'}</TableCell>
+                <TableCell>{entry.returned_date === null ? '' : new Date(entry.returned_date).toLocaleDateString("en-GB")}</TableCell>
                 <TableCell>
-                  <Popover>
+                  <Popover >
                     <PopoverTrigger asChild>
-                      <Button>Rent</Button>
+                    <Button onClick={() => handleEditClick(entry)}>Edit</Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                     <PopoverContent className="w-72 h-96 overflow-y-scroll flex flex-col">
                       <div className="grid gap-4">
                         <div className="space-y-2">
                           <p className="text-sm text-muted-foreground">Edit details</p>
@@ -113,7 +132,7 @@ export default function RentedBooks() {
                             <Label htmlFor={key}>{key.replace('_', ' ')}</Label>
                             <Input
                               id={key}
-                              value={updateDetails[key] }
+                              value={updateDetails[key] || entry[key] || ''}
                               type={key==='returned_date'?'date':''}
                               onChange={(e) =>
                                 setUpdateDetails((prev) => ({ ...prev, [key]: e.target.value }))
@@ -124,7 +143,8 @@ export default function RentedBooks() {
                           </div>
                         ))}
                       </div>
-                      <Button onClick={() => handleEdit(entry)}>Save</Button>
+                      
+                      <Button  className="my-4 place-self-center" onClick={() => handleSave(entry)}>Save</Button>
                     </PopoverContent>
                   </Popover>
                 </TableCell>
@@ -133,7 +153,7 @@ export default function RentedBooks() {
           </TableBody>
         </Table>
       ) : (
-        <Alert>Loading...</Alert>
+        <Alert>No books rented yet</Alert>
       )}
     </div>
   );

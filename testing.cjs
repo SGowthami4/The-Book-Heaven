@@ -4,7 +4,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const { log } = require("console");
+// const { log } = require("console");
 
 const app = express();
 app.use(express.json());
@@ -119,9 +119,9 @@ app.get('/userPage',(req,res)=>{
   
   res.json({"message":"Welcome!"})
 })
-app.get('/getAllUsers',authenticateToken,authorizeRole('Admin'),async(req,res)=>{
+app.get('/getAllUsers',authenticateToken,authorizeRole('admin'),async(req,res)=>{
   try{
-    const fetchingUsers=await client.query(`select * from users where role!='Admin';`)
+    const fetchingUsers=await client.query(`select * from users where role!='admin';`)
     res.status(200).json({allUsers:fetchingUsers.rows})
   }catch(err){
     console.error("Error executing query", err.stack)
@@ -152,7 +152,16 @@ app.get("/user", authenticateToken, async(req, res) => {
     console.log(error);
   }
 });
-app.get("/admin", authenticateToken,authorizeRole("Admin"), (req, res) => {
+// app.get("/user", authenticateToken, async(req, res) => {
+//   // console.log(`userId:${user.user_id}`);
+//   const userId=user.user_id;
+//   try{
+//     res.json({message:'Welcome to user page'})
+//   }catch (error) {
+//     console.log(error);
+//   }
+// });
+app.get("/admin", authenticateToken,authorizeRole("admin"), (req, res) => {
   let adminId=req.user.userId;
   res.json({ message:'Welcome to admin page'});
 
@@ -213,13 +222,24 @@ app.put('/rentedDetails/:user_id',async(req,res)=>{
   const returnedDate = changedValues.returned_date ? `'${changedValues.returned_date}'` : 'NULL';
 
   try{
-    const changes=await client.query(`Begin;
-      Update renteddetails set user_id=${changedValues.user_id},book_id=${changedValues.book_id},rented_book='${changedValues.rented_book}',rental_quantity=${changedValues.rental_quantity},returned=${changedValues.returned},returned_date =${returnedDate}
- where s_no=${changedValues.s_no};
-      update books set no_of_copies_rented=(select no_of_copies_rented from books where book_id=${changedValues.book_id})+${changedValues.rental_quantity},no_of_copies_available=(select total_copies from books where book_id=${changedValues.book_id})-${changedValues.rental_quantity} where book_id=${changedValues.book_id}`)
+    const changeRentals=await client.query(`update renteddetails set user_id=$1,book_id=$2,rented_book=$3,rental_quantity=$4,returned=$5,returned_date=$6 where s_no=$7`,
+      [changedValues.user_id,changedValues.book_id,changedValues.rented_book,changedValues.rental_quantity,changedValues.returned,changedValues.returned_date,changedValues.s_no]);
+      const changeBookTable = await client.query(`
+        UPDATE books
+        SET 
+            no_of_copies_rented = no_of_copies_rented + $2,
+            no_of_copies_available = total_copies - (no_of_copies_rented + $2)
+        WHERE 
+            book_id = $1
+    `, [changedValues.book_id, changedValues.rental_quantity]);
+    
+//     const changes=await client.query(`Begin;
+//       Update renteddetails set user_id=${changedValues.user_id},book_id=${changedValues.book_id},rented_book='${changedValues.rented_book}',rental_quantity=${changedValues.rental_quantity},returned=${changedValues.returned},returned_date =${returnedDate}
+//  where s_no=${changedValues.s_no};
+//       update books set no_of_copies_rented=(select no_of_copies_rented from books where book_id=${changedValues.book_id})+${changedValues.rental_quantity},no_of_copies_available=(select total_copies from books where book_id=${changedValues.book_id})-${changedValues.rental_quantity} where book_id=${changedValues.book_id};`)
+//       await client.query('Commit')
         res.status(200).json({message:"Updated successfully"})
-      await client.query('Commit')
-        // console.log(changes);
+    console.log(changeRentals,changeBookTable);
         
 
   }catch(err){

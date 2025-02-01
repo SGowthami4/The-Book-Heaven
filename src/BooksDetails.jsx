@@ -53,6 +53,7 @@ export default function BooksDetails() {
     fetchedBooks();
   }, []);
 
+
   const handleRentingBook = async () => {
     if(!renterDetails.user_id || !renterDetails.rental_date || !renterDetails.rental_quantity){
       setRentedMessage('All fields are required for renting');
@@ -130,7 +131,7 @@ export default function BooksDetails() {
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button>Rent</Button>
+                      <Button onClick={()=>setRenterDetails(book)}>Rent</Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80">
                       <div className="grid gap-4">

@@ -63,11 +63,10 @@ app.use(cors());
 
 //   books.forEach((book) => {
 //     client.query(`
-//       INSERT INTO books (ISBN, title, author, genre, pages, language, no_of_copies_rented, no_of_copies_available, Total_copies,price)
-//       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,$10)
+//       INSERT INTO books (title, author, genre, pages, language, no_of_copies_rented, no_of_copies_available, Total_copies,price)
+//       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 //     `,
 //     [
-//       book.ISBN,
 //       book.title,
 //       book.author,
 //       book.genre,
@@ -94,3 +93,5 @@ app.use(cors());
 //   returned_date varchar(100),
 //   rental_quantity int
 //   );
+
+

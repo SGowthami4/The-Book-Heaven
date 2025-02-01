@@ -13,7 +13,7 @@ import UsersDetails from "./UsersDetails";
 import RentedBooks from "./RentedBooks";
 
 function App() {
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState("");
   const [newUser,setNewUser]=useState(false)
  
 
