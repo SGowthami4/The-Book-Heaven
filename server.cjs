@@ -4,7 +4,6 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-// const { log } = require("console");
 
 const app = express();
 app.use(express.json());
@@ -12,10 +11,10 @@ const PORT = 3005 || 5000;
 
 const JWT_SECRET = "bcd8672b887b43d2758983a367cfc873368f98a228f70ced3e";
 const client = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "jtd_new",
-  password: "jtd@123",
+  user: "book_heaven_user",
+  host: "dpg-cuf73056l47c73ffpep0-a.oregon-postgres.render.com",
+  database: "book_heaven",
+  password: "cIxoZX9sQMG9ooyLtpmO63idv2Sr4IAO",
   port: 5432,
 });
 
