@@ -1,16 +1,36 @@
+require("dotenv").config();
 const { Pool } = require("pg");
 // client is a module inside pg
 const express = require("express");
+const app = express();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-require("dotenv").config();
 
-const app = express();
+const PORT = process.env.PORT || 5001;
+const JWT_SECRET = process.env.JWT_SECRET;
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }));
+
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_URL);
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.header("Access-Control-Allow-Credentials", "true");
+  
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+  
+    next();
+  });
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET;
 
 const client = new Pool({
   user: process.env.DB_USER,
@@ -18,16 +38,12 @@ const client = new Pool({
   database: process.env.DB_NAME,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  ssl:{
+    rejectUnauthorized:false,
+  }
 });
 
-app.use(
-  cors({
-    origin: "https://book-heaven-gowthami4.netlify.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+
 
 
 
