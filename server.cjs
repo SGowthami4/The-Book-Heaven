@@ -4,29 +4,31 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 app.use(express.json());
-const PORT = 3005 || 5000;
 
-const JWT_SECRET = "bcd8672b887b43d2758983a367cfc873368f98a228f70ced3e";
+const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET;
+
 const client = new Pool({
-  user: "book_heaven_user",
-  host: "dpg-cuf73056l47c73ffpep0-a.oregon-postgres.render.com",
-  database: "book_heaven",
-  password: "cIxoZX9sQMG9ooyLtpmO63idv2Sr4IAO",
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
-app.use(cors());
-// app.use(
-//   cors({
-//     origin: "https://example.com",
-//     methods: ["GET", "POST"],
-//     allowedHeaders: ["Content-type", "Authorization"],
-//     credentials: true,
-//   })
-// );
+app.use(
+  cors({
+    origin: "https://book-heaven-gowthami.netlify.app/",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 
 
 //MiddleWare
@@ -64,7 +66,6 @@ app.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10); // 10-tells how many times the hashing algorithm is performed.
     console.log("hashed password is", hashedPassword);
 
-    await client.connect();
     const user = await client.query(
       "INSERT INTO users (username,password,email,role) VALUES ($1,$2,$3,$4)",
       [username, hashedPassword,email,role]
@@ -75,15 +76,12 @@ app.post("/register", async (req, res) => {
   } catch (error) {
     console.log(error);
   }
-  // finally {
-  //   client.end();
-  // }
+ 
 });
 let role;
 app.post("/login", async (req, res) => {
   const { username, password} = req.body;
   try {
-    // await client.connect();
     const result = await client.query("SELECT * FROM users WHERE username=$1", [
       username,
     ]);
@@ -110,9 +108,7 @@ app.post("/login", async (req, res) => {
   } catch (error) {
     console.log("error", error);
   }
-  //  finally {
-  //   client.end();
-  // }
+  
 });
 app.get('/userPage',(req,res)=>{
   
@@ -126,18 +122,14 @@ app.get('/getAllUsers',authenticateToken,authorizeRole('admin'),async(req,res)=>
   }catch(err){
     console.error("Error executing query", err.stack)
   }finally{
-    // await client.end
   }
 })
 app.get('/books',authenticateToken,async(req,res)=>{
   try{
-    // await client.connect();
     const retrievedBooks=await client.query('select * from books limit 8;')
     res.status(200).json({"books":retrievedBooks.rows})
   }catch(err){
     console.error("Error executing query", err.stack)
-  }finally{
-    // await client.end();
   }
 })
 app.get("/user", authenticateToken, async(req, res) => {
@@ -185,7 +177,6 @@ app.post("/rentingBook", async (req, res) => {
     console.log(error);
   }
   // finally {
-  //   client.end();
   // }
 });
 app.get('/users/:user_id', async (req, res) => {
@@ -194,7 +185,6 @@ app.get('/users/:user_id', async (req, res) => {
     if (!userId || isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID format" });
     }
-    await client.connect();
     const result = await client.query(`SELECT * FROM users WHERE user_id=$1;`, [userId]); 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
@@ -207,14 +197,12 @@ app.get('/users/:user_id', async (req, res) => {
 });
 app.get('/rentedDetails',async(req,res)=>{
   try{
-    // await client.connect();
     const rentedBooks=await client.query('select users.user_id,users.username,renteddetails.s_no,renteddetails.book_id,renteddetails.rented_book,renteddetails.rental_date,renteddetails.returned,renteddetails.returned_date,renteddetails.rental_quantity from users Inner join renteddetails on renteddetails.user_id=users.user_id;')
     // console.log(rentedBooks);
     res.status(200).json({"rentedBooks":rentedBooks.rows})
   }catch(err){
     console.error("Error executing query", err.stack)
   }finally{
-    // await client.end();
   }
 })
 app.put('/rentedDetails/:user_id',async(req,res)=>{
@@ -247,10 +235,7 @@ app.put('/rentedDetails/:user_id',async(req,res)=>{
 
   }catch(err){
     console.error("Error executing query", err.stack)
-  }finally{
-    // await client.end();
   }
-  
 })
 
 app.post("/addBook", async (req, res) => {
