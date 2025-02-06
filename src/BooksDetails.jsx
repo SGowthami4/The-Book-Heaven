@@ -81,7 +81,7 @@ export default function BooksDetails() {
   useEffect(() => {
     const fetchedBooks = async () => {
       try {
-        const response = await fetch("http://localhost:3005/books", {
+        const response = await fetch("https://the-book-heaven-jkie.onrender.com/books", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -100,15 +100,19 @@ export default function BooksDetails() {
   }, [changedBookState,deletedBook]);
 
 
-  const handleRentingBook = async () => {
+  const handleRentingBook = async (book) => {
     if(!renterDetails.user_id ){
       setRentedMessage('All fields are required for renting');
       return;
         }
+    if(book.no_of_copies_available<1){
+      setRentedMessage('Unavailable');
+      return;
+    }
     try {
       // Fetch username for success message
       const userId = Number(renterDetails.user_id);
-      const userResponse = await fetch(`http://localhost:3005/users/${userId}`, {
+      const userResponse = await fetch(`https://the-book-heaven-jkie.onrender.com/users/${userId}`, {
         method: "GET",
       });
       if (!userResponse.ok) {
@@ -120,7 +124,7 @@ export default function BooksDetails() {
       console.log(userData);
       
       // Send POST request to rent a book
-      const response = await fetch("http://localhost:3005/rentingBook", {
+      const response = await fetch("https://the-book-heaven-jkie.onrender.com/rentingBook", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -152,7 +156,7 @@ export default function BooksDetails() {
       return;
     }
     try{
-      const response = await fetch("http://localhost:3005/addBook", {
+      const response = await fetch("https://the-book-heaven-jkie.onrender.com/addBook", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -183,7 +187,7 @@ export default function BooksDetails() {
     }
   
     try {
-      const response = await fetch(`http://localhost:3005/editBook/${book.book_id}`, {
+      const response = await fetch(`https://the-book-heaven-jkie.onrender.com/editBook/${book.book_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -209,7 +213,7 @@ export default function BooksDetails() {
   
    const handleDeleteBook= async(book)=>{
     try {
-      const response = await fetch(`http://localhost:3005/delete/${book.book_id}`, {
+      const response = await fetch(`https://the-book-heaven-jkie.onrender.com/delete/${book.book_id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -556,7 +560,7 @@ export default function BooksDetails() {
                           </div>
                          
                         </div>
-                        <Button onClick={()=>handleRentingBook}>Rent</Button>
+                        <Button onClick={()=>handleRentingBook(book)}>Rent</Button>
                       </div>
                     </PopoverContent>
                   </Popover>

@@ -12,7 +12,7 @@ function User() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3005/user", {
+        const response = await fetch("https://the-book-heaven-jkie.onrender.com/user", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,

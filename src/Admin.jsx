@@ -9,7 +9,7 @@ export default function Admin({ newUser, setNewUser }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3005/admin", {
+        const response = await fetch("https://the-book-heaven-jkie.onrender.com/admin", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,

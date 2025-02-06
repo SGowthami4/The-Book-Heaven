@@ -26,7 +26,7 @@ export default function Register({setNewUser}) {
     }
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3005/register", {
+      const response = await fetch("https://the-book-heaven-jkie.onrender.com/register", {
         method: "POST",
         headers: {
           "Content-type": "application/json",
