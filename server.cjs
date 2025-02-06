@@ -22,7 +22,7 @@ const client = new Pool({
 
 app.use(
   cors({
-    origin: "https://book-heaven-gowthami.netlify.app/",
+    origin: "https://book-heaven-gowthami4.netlify.app/",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
