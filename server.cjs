@@ -8,7 +8,7 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-const PORT = 3005;
+const PORT = 3005 || 5000;
 
 const JWT_SECRET = "bcd8672b887b43d2758983a367cfc873368f98a228f70ced3e";
 const client = new Pool({
@@ -121,7 +121,8 @@ app.get('/userPage',(req,res)=>{
 })
 app.get('/getAllUsers',authenticateToken,authorizeRole('admin'),async(req,res)=>{
   try{
-    const fetchingUsers=await client.query(`select * from users where role!='admin';`)
+    const fetchingUsers=await client.query(`select u.user_id,u.username,u.email,json_agg(r.rented_book) as rented_books from renteddetails r inner join users u on u.user_id=r.user_id where u.role='user' group by u.user_id ;`);
+    console.log(fetchingUsers.rows);
     res.status(200).json({allUsers:fetchingUsers.rows})
   }catch(err){
     console.error("Error executing query", err.stack)
@@ -167,16 +168,17 @@ app.get("/admin", authenticateToken,authorizeRole("admin"), (req, res) => {
 
 });
 app.post("/rentingBook", async (req, res) => {
-  const { user_id, book_id, rented_book, rental_date, rental_status, rental_quantity } = req.body;
+  const {user_id,book_id,title} = req.body;
   
   // Ensure required fields are provided
-  if (!user_id || !book_id || !rented_book || !rental_date || !rental_quantity) {
+  if (!user_id || !book_id || !title) {
     return res.status(400).json({ message: "Missing required fields" });
   }  try {
    const rentDetails=await client.query(
-      "INSERT INTO renteddetails(user_id, book_id, rented_book, rental_date, rental_status, rental_quantity) VALUES ($1, $2, $3, $4, $5, $6)",
-      [user_id, book_id, rented_book, rental_date, rental_status, rental_quantity]
+      "INSERT INTO renteddetails(user_id, book_id, rented_book) VALUES ($1, $2, $3)",
+      [user_id,book_id, title]
     );
+    await client.query('update books set no_of_copies_rented=no_of_copies_rented+1,no_of_copies_available=no_of_copies_available-1 where book_id=$1',[book_id]);
     console.log(rentDetails);
 
     res.status(201).json({ message: "rented successfully" });
@@ -222,24 +224,26 @@ app.put('/rentedDetails/:user_id',async(req,res)=>{
   const returnedDate = changedValues.returned_date ? `'${changedValues.returned_date}'` : 'NULL';
 
   try{
-    const changeRentals=await client.query(`update renteddetails set user_id=$1,book_id=$2,rented_book=$3,rental_quantity=$4,returned=$5,returned_date=$6 where s_no=$7`,
-      [changedValues.user_id,changedValues.book_id,changedValues.rented_book,changedValues.rental_quantity,changedValues.returned,changedValues.returned_date,changedValues.s_no]);
-      const changeBookTable = await client.query(`
-        UPDATE books
-        SET 
-            no_of_copies_rented = no_of_copies_rented + $2,
-            no_of_copies_available = total_copies - (no_of_copies_rented + $2)
-        WHERE 
-            book_id = $1
-    `, [changedValues.book_id, changedValues.rental_quantity]);
-    
+    const changeRentals=await client.query(`update renteddetails set user_id=$1,book_id=$2,rented_book=$3,returned=$4,returned_date=$5 where s_no=$6`,
+      [changedValues.user_id,changedValues.book_id,changedValues.rented_book,changedValues.returned,changedValues.returned_date,changedValues.s_no]);
+      if(changedValues.returned){
+
+        const changeBookTable = await client.query(`
+          UPDATE books
+          SET 
+              no_of_copies_rented = no_of_copies_rented - $1,
+              no_of_copies_available = total_copies -no_of_copies_rented 
+          WHERE 
+              book_id = $1
+      `, [changedValues.book_id]);    
+      }
 //     const changes=await client.query(`Begin;
 //       Update renteddetails set user_id=${changedValues.user_id},book_id=${changedValues.book_id},rented_book='${changedValues.rented_book}',rental_quantity=${changedValues.rental_quantity},returned=${changedValues.returned},returned_date =${returnedDate}
 //  where s_no=${changedValues.s_no};
 //       update books set no_of_copies_rented=(select no_of_copies_rented from books where book_id=${changedValues.book_id})+${changedValues.rental_quantity},no_of_copies_available=(select total_copies from books where book_id=${changedValues.book_id})-${changedValues.rental_quantity} where book_id=${changedValues.book_id};`)
 //       await client.query('Commit')
         res.status(200).json({message:"Updated successfully"})
-    console.log(changeRentals,changeBookTable);
+    console.log(changeRentals);
         
 
   }catch(err){
@@ -248,6 +252,59 @@ app.put('/rentedDetails/:user_id',async(req,res)=>{
     // await client.end();
   }
   
+})
+
+app.post("/addBook", async (req, res) => {
+  const {title,author,genre,language,pages,price,total_copies} = req.body;
+  
+  // Ensure required fields are provided
+  if (!title || !author || !genre || !language || !pages || !price || !total_copies) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }  try {
+   const addedBook=await client.query(
+      "INSERT INTO books(title,author,genre,language,pages,price,no_of_copies_available,total_copies) VALUES ($1, $2, $3,$4,$5,$6,$7,$7)",
+      [title,author,genre,language,pages,price,total_copies]
+    );
+    console.log(addedBook);
+    
+    res.status(201).json({ message: "added successfully" });
+  } catch (error) {
+    console.log(error);
+  }
+  // finally {
+  //   client.end();
+  // }
+});
+app.put('/editBook/:book_id',async(req,res)=>{
+  const bookId=parseInt(req.params.book_id); 
+  const {title,author,genre,language,pages,price,total_copies} = req.body;
+  if (!bookId) {
+    return res.status(400).json({ message: "Invalid or missing book ID" });
+  }  try {
+    const editedBook=await client.query(`update books set title=$1,author=$2,genre=$3,language=$4,pages=$5,price=$6,total_copies=$7 where book_id=$8`,[title,author,genre,language,pages,price,total_copies,bookId]);
+    console.log(editedBook);
+    if (editedBook.rowCount === 0) {
+      return res.status(404).json({ message: "Book not found or not updated" });
+    }
+    res.status(200).json({ message: "Edited successfully" });
+  }catch (error) {
+    console.error("Error updating book:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+})
+
+app.delete('/delete/:book_id',async(req,res)=>{
+  const {book_id,title}=req.body;
+  if(!book_id || !title){
+    return res.status(400).json({ message: "Missing required field" });
+  } try {
+    const deletingBook= await client.query(`delete from books where book_id=$1 and title=$2`,[book_id,title]);
+    console.log(deletingBook);
+
+    res.status(200).json({ message: "Deleted successfully" });
+  }catch (error) {
+    console.log(error);
+  }
 })
 app.listen(PORT, () => {
   console.log("Server is running");

@@ -1,6 +1,5 @@
 import { Button } from './components/ui/button';
-import { Popover, PopoverContent } from './components/ui/popover';
-import { PopoverTrigger } from '@radix-ui/react-popover';
+import { Popover, PopoverContent,PopoverTrigger} from './components/ui/popover';
 import { useState, useEffect } from 'react';
 import { Alert } from './components/ui/alert';
 import { Table,TableBody,TableHeader,TableRow,TableCell,TableHead,TableCaption } from './components/ui/table';
@@ -9,7 +8,6 @@ import { Input } from './components/ui/input';
 import {useNavigate} from 'react-router-dom'
 export default function RentedBooks() {
   const [rentedInfo, setRentedInfo] = useState([]);
-  const [popOverOpen,setPopOverOpen]=useState(false)
   const [updateDetails, setUpdateDetails] = useState({
     s_no:'',
     user_id:'',
@@ -21,7 +19,6 @@ export default function RentedBooks() {
     returned :false,
     returned_date:''
   });
-  const [refresh, setRefresh] = useState(false);
   const navigate=useNavigate()
 
   useEffect(() => {
@@ -43,10 +40,9 @@ export default function RentedBooks() {
       }
     };
     fetchingInfo();
-  }, [refresh]);
+  },[]);
 
   const handleEditClick = (entry) => {
-    setPopOverOpen(true)
     setUpdateDetails(entry); 
   };
   
@@ -61,24 +57,24 @@ export default function RentedBooks() {
         },
         body: JSON.stringify(updateDetails),
       });
-
+  
       if (!response.ok) {
         throw new Error(`Failed to update rental details`);
       }
-
+  
       setRentedInfo((prev) =>
-        prev.map((item) => (item.user_id === entry.user_id ? { ...item, ...updateDetails } : item))
+        prev.map((item) =>
+          item.s_no === entry.s_no ? { ...item, ...updateDetails } : item
+        )
       );
-
-      setRefresh(true);
-      setPopOverOpen(false)
+  
       setUpdateDetails({});
       alert("Rental details updated successfully!");
-      setRefresh(false)
     } catch (error) {
       console.error("Error updating rental details:", error);
     }
   };
+  
 
   return (
     <div  className=''>
@@ -94,12 +90,11 @@ export default function RentedBooks() {
           <TableCaption>Rental Details</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Entry No</TableHead>
+              <TableHead>S No</TableHead>
               <TableHead>User ID</TableHead>
               <TableHead>Username</TableHead>
               <TableHead>Book ID</TableHead>
               <TableHead>Book Name</TableHead>
-              <TableHead>Quantity</TableHead>
               <TableHead>Rental Date</TableHead>
               <TableHead>Returned Status</TableHead>
               <TableHead>Returned Date</TableHead>
@@ -113,7 +108,6 @@ export default function RentedBooks() {
                 <TableCell>{entry.username}</TableCell>
                 <TableCell>{entry.book_id}</TableCell>
                 <TableCell>{entry.rented_book}</TableCell>
-                <TableCell>{entry.rental_quantity}</TableCell>
                 <TableCell>{new Date(entry.rental_date).toLocaleDateString("en-GB")}</TableCell>
                 <TableCell>{entry.returned === false ? 'NO' : 'YES'}</TableCell>
                 <TableCell>{entry.returned_date === null ? '' : new Date(entry.returned_date).toLocaleDateString("en-GB")}</TableCell>
@@ -123,11 +117,12 @@ export default function RentedBooks() {
                     <Button onClick={() => handleEditClick(entry)}>Edit</Button>
                     </PopoverTrigger>
                      <PopoverContent className="w-72 h-96 overflow-y-scroll flex flex-col">
-                      <div className="grid gap-4">
+                      <div className="grid gap-4" >
                         <div className="space-y-2">
                           <p className="text-sm text-muted-foreground">Edit details</p>
                         </div>
                         {Object.keys(entry).map((key) => (
+                          !(key=='rental_quantity')?
                           <div key={key} className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor={key}>{key.replace('_', ' ')}</Label>
                             <Input
@@ -140,11 +135,12 @@ export default function RentedBooks() {
                               className="col-span-2 h-8"
                               disabled={key==="rental_date"}
                             />
-                          </div>
+                          </div>:
+                         null
                         ))}
                       </div>
                       
-                      <Button  className="my-4 place-self-center" onClick={() => handleSave(entry)}>Save</Button>
+                      <Button  className="my-4 place-self-center"  onClick={() => handleSave(entry)}>Save</Button>
                     </PopoverContent>
                   </Popover>
                 </TableCell>

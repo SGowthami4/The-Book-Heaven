@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "./components/ui/button";
 import {useNavigate} from 'react-router-dom';
 import { Alert,AlertDescription } from "./components/ui/alert";
-import { Card, CardDescription, CardFooter, CardTitle } from "./components/ui/card";
+import { Card, CardDescription, CardFooter, CardTitle,CardHeader,CardContent } from "./components/ui/card";
 
 function User() {
   const [message, setMessage] = useState("");
@@ -37,30 +37,28 @@ function User() {
       <div className="flex justify-end p-8">
         <Button onClick={()=>navigate('/userPage')}>Back</Button>
       </div>
-      <div>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 h-full gap-10">
       {userBooks? userBooks.map((book)=>(
-        <Card key={book.title} >
-          <CardTitle>
-
-        Book Name:{book.title}
-          </CardTitle>
-          <CardDescription className="flex-col items-center justify-center"><p className="text-3xl">
-          Book Author: {book.author}
-          </p>
-          <p className="text-2xl">Genre :{book.genre}</p>
-          <p className="text-2xl">Pages: {book.pages}</p>
-          <p className="text-2xl">Language :{book.language}</p>
-          <p className="text-2xl">Available copies: {book.no_of_copies_available}</p>
-
+          <Card key={[book.title,book.rental_date]} className="flex flex-col py-4 px-2 border-2 border-b-4 border-r-4 text-start  start">
+          <CardHeader className="pl-4">
+            <CardTitle>{book.title}</CardTitle>
+            <CardDescription>
+              <p><strong>Author:</strong> {book.author}</p>
             </CardDescription>
-            <CardFooter className="flex-col items-center justify-center">
-              <p className="text-2xl">
-              Rented On:{
-              book.rental_date}
-              </p>
-            </CardFooter>
-        </Card>
+          </CardHeader>
+          <CardContent className="pl-4"> 
+            <p><strong>Genre:</strong> {book.genre}</p>
+            <p><strong>Pages:</strong> {book.pages}</p>
+            <p><strong>Language:</strong> {book.language}</p>
+            <p><strong>Price:</strong> ₹ {book.price}</p>
+            <p><strong>Copies Available:</strong> {book.no_of_copies_available}</p>
+          </CardContent>
+          <CardFooter className="pl-4">
+          
+              <strong>Rental Date:</strong> {new Date(book.rental_date).toLocaleDateString('en-US')}
+           
+          </CardFooter>
+      </Card>      
       )) : (
      <div>
      <p>No books Rented</p>

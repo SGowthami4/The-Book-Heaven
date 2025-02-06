@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
-import { Card, CardDescription, CardTitle } from './components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardTitle } from './components/ui/card'
 import { Button } from './components/ui/button'
 import {useNavigate} from 'react-router-dom'
 
@@ -31,42 +31,37 @@ export default function UsersDetails({newUser,setNewUser }) {
     fetchData();
   },[newUser])
   return (
-    <div className='grid gap-3'>
-      <div className='flex justify-end gap-2'>
+    <div className=''>
+      <h1 className='font-medium m-4 text-4xl'>Users Details</h1>
+      <div className='flex justify-end gap-2 m-2'>
         <Button onClick={()=>navigate('/admin')}>Back</Button>
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 h-full gap-8 text-start">
        {users.length > 0 ? (
-        users.map((user) => (
-          <Card key={user.user_id}>
-            <CardTitle>
+        users.map((user) => 
+        
+          <Card key={user.user_id} className='p-4 border-b-4 border-r-4'>
+            <CardContent>
               <p>
-              {user.user_id}: {user.username}
+              <strong>UserID : </strong> {user.user_id}
                 </p>
-                <p><strong>mail :</strong>{user.email}</p>
-            </CardTitle>
-            <CardDescription>
-              {/* <div>
-                {user.rentedbook_id!=0?
-                <div>
-
-                  <p>BookId:{user.rentedbook_id}</p>
-                  <p>bookName:{user.rentedbook_name}</p>
-                  <p>rentedDate:{user.rented_date}</p>
-                  {user.returnstatus? <div><p>Return status:returned</p>
-                  <p>Returned on:{user.returned_date}</p>
-                  </div> : <p>Return status:Not returned yet</p>
-                 }
-                 <p>Quantity:{user.quantity?user.quantity:0}</p>
-                </div>
-              : <p>No  books rented Yet</p> }
-              </div> */}
-              <p>Books details</p>
-            </CardDescription>
+              <p><strong>UserName : </strong>{user.username}</p>
+                <p><strong>mail : </strong>{user.email}</p>
+            </CardContent>
+            <CardFooter>
+              <p>
+            <strong>Rented Books: </strong> 
+            {user.rented_books && user.rented_books.length > 0 
+  ? user.rented_books.join(", ") 
+  : "No rented books"}
+              </p>
+            </CardFooter>
           </Card>
-        ))
+       )
       ) : (
         <p>Users not found</p>
       )}
+      </div>
     </div>
   )
 }

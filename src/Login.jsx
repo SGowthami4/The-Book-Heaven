@@ -125,17 +125,22 @@ export default function Login() {
             <CardFooter>
               <Button onClick={handleLogin}>Login</Button>
             </CardFooter>
+            
             {loggedIn ? (
   loginMessage === 'Login successful!' ? (
-    <Alert className='align-middle'>
-      <AlertDescription>{loginMessage}</AlertDescription>
+    <div className="flex justify-center ">
+    <Alert className=' w-1/3 '>
+      <AlertDescription className='lg:text-lg md:text-sm sm:text-xs font-semibold'>{loginMessage}</AlertDescription>
       <Button onClick={() => {navigate('/userPage'),setLoggedIn(false)}}>Continue</Button>
     </Alert>
+    </div>
   ) : (
+    <div>
     <Alert>
-      <AlertDescription>{loginMessage}</AlertDescription>
+      <AlertDescription className='text-xl font-semibold'>{loginMessage}</AlertDescription>
       <Button onClick={() => {navigate('/login'),setLoggedIn(false)}}>Try Again</Button>
     </Alert>
+    </div>
   )
 ) : null}
           </Card>

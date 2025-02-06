@@ -39,7 +39,7 @@ export default function Books() {
       {fetchingbooks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 h-full gap-10">
           {fetchingbooks.map((book) => (
-            <Card key={book.book_id}>
+            <Card key={book.book_id} className="flex flex-col p-2 border-2 shadow-md  text-start">
               <CardHeader>
                 <CardTitle>{book.title}</CardTitle>
                 <CardDescription>{book.isbn}</CardDescription>
@@ -50,7 +50,7 @@ export default function Books() {
                 <p><strong>Price:</strong> ₹ {book.price}</p>
                 <p><strong>Pages:{book.pages}</strong></p>
                 <p><strong>Language:</strong>{book.language}</p>
-                <p><strong>Copies Available:</strong> {book.no_of_copies_available}</p>
+                <p><strong>Copies Available:</strong> {book.no_of_copies_available?book.no_of_copies_available:(<p className='text-red-600'>Unavailable</p>) }</p>
               </CardContent>
             </Card>
           ))}
