@@ -23,17 +23,21 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useNavigate } from "react-router-dom";
+import { EyeIcon,EyeOff } from "lucide-react";
 
 export default function Login() {
+  const [showPassword, setShowPassword] =useState(false)
   const [loginMessage, setLoginMessage] = useState("");
   const [loggedIn,setLoggedIn]=useState(false)
+  const [loading,setLoading]=useState(false)
   const [loginInfo, setLoginInfo] = useState({
     username: "",
     password: "",
     role: "",
   });
   const navigate = useNavigate();
-  
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+ 
   const handleLogin = async (e) => {
     setLoggedIn(true)
     e.preventDefault();
@@ -66,8 +70,8 @@ export default function Login() {
   };
   
   return (
-    <div>
-      <Card>
+    <div className='flex justify-center'>
+       <Card className={'w-5/6 max-w-[500px] '}>
             <CardHeader>
               <CardTitle>Login</CardTitle>
             </CardHeader>
@@ -89,14 +93,20 @@ export default function Login() {
                 <Label htmlFor="password" className=" flex justify-items-start">
                   Password
                 </Label>
+                <div className={'flex justify-items-end items-center border border-gray-200 rounded-md'}>
+
                 <Input
+                   className={"border-none focus-visible:outline-none focus-visible:ring-0"}
                   id="password"
+                  type={showPassword?'text':'password'}
                   placeholder="Password"
                   value={loginInfo.password}
                   onChange={(e) =>
                     setLoginInfo({ ...loginInfo, password: e.target.value })
                   }
                 />
+                <span className='pr-4' onClick={handleClickShowPassword}>{showPassword?<EyeOff/>:<EyeIcon/>}</span>
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="role" className=" flex justify-items-start">
@@ -110,7 +120,7 @@ export default function Login() {
                   )}
                   id="role"
                 >
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-2/3">
                     <SelectValue placeholder="Role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -123,26 +133,28 @@ export default function Login() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleLogin}>Login</Button>
+            <Button onClick={handleLogin} disabled={loading} >        {loading?"Logging In...":"Login"}              </Button>
+
             </CardFooter>
             
             {loggedIn ? (
   loginMessage === 'Login successful!' ? (
-    <div className="flex justify-center ">
-    <Alert className=' w-1/3 '>
-      <AlertDescription className='lg:text-lg md:text-sm sm:text-xs font-semibold'>{loginMessage}</AlertDescription>
-      <Button onClick={() => {navigate('/userPage'),setLoggedIn(false)}}>Continue</Button>
-    </Alert>
-    </div>
+   navigate('/userPage')
+  //  <Alert className=' w-1/3 '>
+  //     <AlertDescription>{loginMessage}</AlertDescription>
+  //     <Button onClick={() => {navigate('/userPage'),setLoggedIn(false)}}>Continue</Button>
+  //   </Alert>
   ) : (
     <div>
     <Alert>
-      <AlertDescription className='text-xl font-semibold'>{loginMessage}</AlertDescription>
+      <AlertDescription className='text-sm font-semibold'>{loginMessage}</AlertDescription>
       <Button onClick={() => {navigate('/login'),setLoggedIn(false)}}>Try Again</Button>
     </Alert>
     </div>
   )
 ) : null}
+<p className='p-2'>Not Registered?  <a href="/" className='text-indigo-700 hover:text-blue-500 underline'>Register</a></p>
+
           </Card>
     </div>
   );

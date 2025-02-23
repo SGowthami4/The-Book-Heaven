@@ -77,24 +77,58 @@ const authenticateToken = (req, res, next) => {
 };
 
 app.post("/register", async (req, res) => {
-  const {username,password,email,role } = req.body;
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10); // 10-tells how many times the hashing algorithm is performed.
+  const { username, password,email, role} = req.body;
+  let receiver=email;
+  try{
+    const hashedPassword = await bcrypt.hash(password, 10); 
     console.log("hashed password is", hashedPassword);
-
-    const user = await client.query(
-      "INSERT INTO users (username,password,email,role) VALUES ($1,$2,$3,$4)",
-      [username, hashedPassword,email,role]
-    );
-    console.log(user);
-
-    res.status(201).json({ message: "user registered" });
-  } catch (error) {
+    const token = jwt.sign({username:username,password:hashedPassword,email:email,role:role}, JWT_SECRET, {
+        expiresIn: "1h",
+      });        
+      const info = await transporter.sendMail({
+        from: sender, // sender address
+        to: receiver, // list of receivers
+        subject: "Mail Verification ✔", // Subject line
+        text: "Click on the link below 👇", // plain text body
+        html: `<div>To verify <a href="http://localhost:3005/verify/${token}">click here</a></div>`
+      });
+      res.status(201).json({ message:"Verification email sent. Please check your inbox!"  });
+  }catch (error) {
     console.log(error);
   }
- 
+  
 });
-let role;
+app.get('/verify/:token', async (req, res) => {
+  try{
+    const receivedToken=req.params.token;
+    console.log("Recieved Token:",receivedToken);
+    const userInfo=jwt.verify(receivedToken,JWT_SECRET);
+    const { username, password, email, role } = userInfo;
+const checkingUserExistence = await client.query(
+  'SELECT * FROM "Users" WHERE email = $1;', 
+  [email]
+);
+   
+if (checkingUserExistence.rowCount > 0 && checkingUserExistence.rows[0].registrationStatus) {
+console.log("User already verified, redirecting to login...");
+return res.redirect('https://book-heaven-gowthami4.netlify.app/login');
+}
+    await client.query(
+      'INSERT INTO users (username, password, email, role, "registrationStatus") VALUES ($1, $2, $3, $4, $5)',
+      [username, password, email, role, true]
+  );
+  console.log("Verified successfully:", username);  
+    res.redirect('https://book-heaven-gowthami4.netlify.app/login')
+  }catch(error){
+    if(error.name==='TokenExpiredError'){
+      console.error('Token Expired:',error)
+      return res.status(403).json({ message: "Verification link expired. Request a new one." });
+    }
+    console.error('verification failed:',error)
+    res.status(403).json({message:'Verification Failed'})
+  }
+})
+
 app.post("/login", async (req, res) => {
   const { username, password} = req.body;
   try {
@@ -132,7 +166,8 @@ app.get('/userPage',(req,res)=>{
 })
 app.get('/getAllUsers',authenticateToken,authorizeRole('admin'),async(req,res)=>{
   try{
-    const fetchingUsers=await client.query(`select u.user_id,u.username,u.email,json_agg(r.rented_book) as rented_books from renteddetails r inner join users u on u.user_id=r.user_id where u.role='user' group by u.user_id ;`);
+    const fetchingUsers=await client.query(`select u.user_id,u.username,u.email,COALESCE(json_agg(r.rented_book) FILTER(WHERE r.rented_book IS NOT NULL),'[]') as rented_books from users u
+      LEFT JOIN renteddetails r ON u.user_id=r.user_id where u.role='user' group by u.user_id;`);
     console.log(fetchingUsers.rows);
     res.status(200).json({allUsers:fetchingUsers.rows})
   }catch(err){
