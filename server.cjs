@@ -103,9 +103,28 @@ app.post("/register", async (req, res) => {
         to: receiver, // list of receivers
         subject: "Mail Verification ✔", // Subject line
         text: "Click on the link below 👇", // plain text body
-        html: `<div style="display: flex; flex-direction: column; gap: 10px;justify-content: center; align-items: center;width:300px;height: 300px;border: 2px;border-radius: 25px; box-shadow: 5px 6px 11px gray;padding: 5px;margin: 10px;">
-      <h1>Book Heaven Verification Mail</h1>
-    <div>To verify <a href="https://book-heaven-gowthami4.netlify.app/verify/${token}">click here</a></div></div>`
+        html: `
+  <table width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #f9f9f9; padding: 20px; text-align: center;">
+    <tr>
+      <td align="center">
+        <table width="400" cellspacing="0" cellpadding="0" border="0" style="background: white; padding: 20px; border: 1px solid #ddd; border-radius: 10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);">
+          <tr>
+            <td style="text-align: center;">
+              <h1 style="color: #333; font-size: 20px;">Book Heaven Verification Mail</h1>
+              <p style="font-size: 16px; color: #555;">To verify, click the button below:</p>
+              <a href="https://the-book-heaven-jkie.onrender.com/verify/${token}" 
+                 style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; font-size: 16px; border-radius: 5px;">
+                Verify Email
+              </a>
+              <p style="font-size: 12px; color: #888;">If you did not request this, please ignore this email.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+`
+
       });
       res.status(201).json({ message:"Verification email sent. Please check your inbox!"  });
   }catch (error) {
