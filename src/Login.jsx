@@ -39,12 +39,12 @@ export default function Login() {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
  
   const handleLogin = async (e) => {
-    setLoggedIn(true)
     e.preventDefault();
     if (!loginInfo.username || !loginInfo.password || !loginInfo.role) {
       setLoginMessage("All fields are required for login");
       return;
     }
+    setLoading(true);
     try {
       const response = await fetch("https://the-book-heaven-jkie.onrender.com/login", {
         method: "POST",
@@ -63,9 +63,17 @@ export default function Login() {
       localStorage.setItem('role',data.role)
       console.log(data.role);    
       setLoginMessage("Login successful!");
+      setLoggedIn(true)
+      setLoginInfo({
+        username: "",
+        password: "",
+        role: "",
+      })
     } catch (error) {
       console.log(error);    
       setLoginMessage(error.response?.data?.message || "Error Logging in");
+    }finally{
+      setLoading(false);
     }
   };
   
@@ -133,7 +141,7 @@ export default function Login() {
               </div>
             </CardContent>
             <CardFooter>
-            <Button onClick={handleLogin} disabled={loading} >        {loading?"Logging In...":"Login"}              </Button>
+            <Button onClick={handleLogin} disabled={loading} > {loading?"Logging In...":"Login"}</Button>
 
             </CardFooter>
             

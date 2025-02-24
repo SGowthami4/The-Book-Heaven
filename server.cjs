@@ -6,7 +6,7 @@ const app = express();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
-const {createTransport} =require('nodemailer')
+const {createTransport} =require('nodemailer');
 
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -173,7 +173,9 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "user doesn't exist" });
     }
     user = result.rows[0];
-    console.log("Retrieved user:", user);
+    console.log(password);
+    
+    // console.log("Retrieved user:", user);
     console.log("Hashed password:", user.password);
 
     const passwordMatch = await bcrypt.compare(password, user.password);
