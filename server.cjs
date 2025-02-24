@@ -103,7 +103,7 @@ app.post("/register", async (req, res) => {
         to: receiver, // list of receivers
         subject: "Mail Verification ✔", // Subject line
         text: "Click on the link below 👇", // plain text body
-        html: `<div>To verify <a href="http://localhost:3005/verify/${token}">click here</a></div>`
+        html: `<div>To verify <a href="https://book-heaven-gowthami4.netlify.app/verify/${token}">click here</a></div>`
       });
       res.status(201).json({ message:"Verification email sent. Please check your inbox!"  });
   }catch (error) {

@@ -133,12 +133,11 @@ export default function Register({setNewUser}) {
               </Button>
             </CardFooter>
             {registered ? (
-  message === 'registered Successfully' ? (
-    navigate('/login')
-    // <Alert className='align-middle'>
-    //   <AlertDescription>Registered Successfully</AlertDescription>
-    //   <Button onClick={() => {navigate('/login'),setRegistered(false)}}>Login</Button>
-    // </Alert>
+  message === "Verification email sent. Please check your inbox!" ? (
+    <Alert className='align-middle'>
+      <AlertDescription className='text-red-500'>Verification email sent. Please check your inbox!</AlertDescription>
+      <Button onClick={() => {navigate('/login'),setRegistered(false)}}>Login</Button>
+    </Alert>
   ) : (
     <Alert>
       <AlertTitle>{message}</AlertTitle>
