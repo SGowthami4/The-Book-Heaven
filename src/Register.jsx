@@ -41,7 +41,7 @@ export default function Register({setNewUser}) {
         throw new Error(errorMessage.message || "Registration Failed");
       }
       const data = await response.json();
-      setMessage("A verification link has been sent to your email.Please check your inbox");
+      setMessage("Verification email sent. Please check your inbox!");
       setRegistered(true)
       setNewUser(true)
       setform({ username: "", password: "", role: "" ,email:""})
