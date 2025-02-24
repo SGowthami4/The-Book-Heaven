@@ -6,6 +6,7 @@ const app = express();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const {createTransport} =require('nodemailer')
 
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -31,6 +32,16 @@ app.use((req, res, next) => {
   });
 app.use(express.json());
 
+const transporter=createTransport({
+  host:'smtp.gmail.com',
+  port:587,
+  secure:false,
+  auth:{
+      user:process.env.EMAIL_SENDER,
+      pass:process.env.EMAIL_PASSWORD
+
+  },
+});
 
 const client = new Pool({
   user: process.env.DB_USER,
