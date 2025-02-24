@@ -139,7 +139,7 @@ app.get('/verify/:token', async (req, res) => {
     const userInfo=jwt.verify(receivedToken,JWT_SECRET);
     const { username, password, email, role } = userInfo;
 const checkingUserExistence = await client.query(
-  'SELECT * FROM "Users" WHERE email = $1;', 
+  'SELECT * FROM users WHERE email = $1;', 
   [email]
 );
    
