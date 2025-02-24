@@ -173,8 +173,8 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ message: "user doesn't exist" });
     }
     user = result.rows[0];
-    // console.log("Retrieved user:", user);
-    // console.log("Hashed password:", user.password);
+    console.log("Retrieved user:", user);
+    console.log("Hashed password:", user.password);
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
