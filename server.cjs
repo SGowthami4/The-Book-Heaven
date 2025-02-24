@@ -143,13 +143,13 @@ const checkingUserExistence = await client.query(
   [email]
 );
    
-if (checkingUserExistence.rowCount > 0 && checkingUserExistence.rows[0].registrationStatus) {
+if (checkingUserExistence.rowCount > 0) {
 console.log("User already verified, redirecting to login...");
 return res.redirect('https://book-heaven-gowthami4.netlify.app/login');
 }
     await client.query(
-      'INSERT INTO users (username, password, email, role, "registrationStatus") VALUES ($1, $2, $3, $4, $5)',
-      [username, password, email, role, true]
+      'INSERT INTO users (username, password, email, role, "registrationStatus") VALUES ($1, $2, $3, $4)',
+      [username, password, email, role]
   );
   console.log("Verified successfully:", username);  
     res.redirect('https://book-heaven-gowthami4.netlify.app/login')
