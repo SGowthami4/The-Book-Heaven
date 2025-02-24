@@ -148,7 +148,7 @@ console.log("User already verified, redirecting to login...");
 return res.redirect('https://book-heaven-gowthami4.netlify.app/login');
 }
     await client.query(
-      'INSERT INTO users (username, password, email, role, "registrationStatus") VALUES ($1, $2, $3, $4)',
+      'INSERT INTO users (username, password, email, role) VALUES ($1, $2, $3, $4)',
       [username, password, email, role]
   );
   console.log("Verified successfully:", username);  
