@@ -135,8 +135,7 @@ export default function Register({setNewUser}) {
             {registered ? (
   message === "Verification email sent. Please check your inbox!" ? (
     <Alert className='align-middle'>
-      <AlertDescription className='text-red-500'>Verification email sent. Please check your inbox!</AlertDescription>
-      <Button onClick={() => {navigate('/login'),setRegistered(false)}}>Login</Button>
+      <AlertDescription className='text-green-600'>Verification email sent. Please check your inbox!</AlertDescription>
     </Alert>
   ) : (
     <Alert>
