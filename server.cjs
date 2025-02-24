@@ -10,6 +10,8 @@ const {createTransport} =require('nodemailer')
 
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET;
+const sender = process.env.EMAIL_SENDER;
+const password = process.env.EMAIL_PASSWORD;
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -37,8 +39,8 @@ const transporter=createTransport({
   port:587,
   secure:false,
   auth:{
-      user:process.env.EMAIL_SENDER,
-      pass:process.env.EMAIL_PASSWORD
+      user:sender,
+      pass:password
 
   },
 });
