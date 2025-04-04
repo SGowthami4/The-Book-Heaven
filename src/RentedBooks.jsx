@@ -12,6 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup
 } from '@/components/ui/select';
 export default function RentedBooks() {
   const [rentedInfo, setRentedInfo] = useState([]);
