@@ -40,7 +40,7 @@ export default function UsersDetails({newUser,setNewUser }) {
        {users.length > 0 ? (
         users.map((user) => 
         
-          <Card key={user.user_id} className='p-4 border-b-4 border-r-4'>
+          <Card key={user.user_id} className='p-4 border-b-4 border-r-4 w-fit'>
             <CardContent>
               <p>
               <strong>UserID : </strong> {user.user_id}
