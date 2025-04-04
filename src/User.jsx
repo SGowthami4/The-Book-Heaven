@@ -51,12 +51,11 @@ function User() {
             <p><strong>Pages:</strong> {book.pages}</p>
             <p><strong>Language:</strong> {book.language}</p>
             <p><strong>Price:</strong> ₹ {book.price}</p>
-            <p><strong>Copies Available:</strong> {book.no_of_copies_available}</p>
           </CardContent>
           <CardFooter className="pl-4">
           
               <strong>Rental Date:</strong> {new Date(book.rental_date).toLocaleDateString('en-US')}
-           
+              <strong>Return Status:{book.returned==true?'Yes':'No'}</strong>
           </CardFooter>
       </Card>      
       )) : (

@@ -99,10 +99,10 @@ app.post("/register", async (req, res) => {
         expiresIn: "1h",
       });        
       const info = await transporter.sendMail({
-        from: sender, // sender address
-        to: receiver, // list of receivers
-        subject: "Mail Verification ✔", // Subject line
-        text: "Click on the link below 👇", // plain text body
+        from: sender, 
+        to: receiver, 
+        subject: "Mail Verification ✔", 
+        text: "Click on the link below 👇",
         html: `
   <table width="100%" cellspacing="0" cellpadding="0" border="0" style="background: #f9f9f9; padding: 20px; text-align: center;">
     <tr>
@@ -224,7 +224,7 @@ app.get("/user", authenticateToken, async(req, res) => {
   const userId=user.user_id;
   try{
 
-    const userRentedBooks=await client.query(`select books.title,books.author,books.genre,books.pages,books.language,books.no_of_copies_available,books.price,renteddetails.rental_date
+    const userRentedBooks=await client.query(`select books.title,books.author,books.genre,books.pages,books.language,books.price,renteddetails.returned,renteddetails.rental_date
   From renteddetails inner join books on renteddetails.book_id=books.book_id where renteddetails.user_id=${userId}; `)
     res.json({ rentedBooks:userRentedBooks.rows});
   }catch (error) {

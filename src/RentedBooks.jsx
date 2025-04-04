@@ -6,6 +6,7 @@ import { Table,TableBody,TableHeader,TableRow,TableCell,TableHead,TableCaption }
 import { Label } from './components/ui/label';
 import { Input } from './components/ui/input';
 import {useNavigate} from 'react-router-dom'
+import { Select } from '@radix-ui/react-select';
 export default function RentedBooks() {
   const [rentedInfo, setRentedInfo] = useState([]);
   const [updateDetails, setUpdateDetails] = useState({
@@ -121,10 +122,27 @@ export default function RentedBooks() {
                         <div className="space-y-2">
                           <p className="text-sm text-muted-foreground">Edit details</p>
                         </div>
-                        {Object.keys(entry).map((key) => (
+                        {Object.keys(entry).map((key) => (      
                           !(key=='rental_quantity')?
                           <div key={key} className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor={key}>{key.replace('_', ' ')}</Label>
+                          <Label htmlFor={key}>{key.replace('_', ' ')}</Label>
+                          {key=='returned'? <Select
+                        value={updateDetails[key] || entry[key] || ''}
+                        onValueChange={(e) =>
+                          setUpdateDetails((prev) => ({ ...prev, [key]: e.target.value }))
+                        }
+                        id={key}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Return Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="true">YES</SelectItem>
+                      <SelectItem value="false">NO</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>:
                             <Input
                               id={key}
                               value={updateDetails[key] || entry[key] || ''}
@@ -134,7 +152,7 @@ export default function RentedBooks() {
                               }
                               className="col-span-2 h-8"
                               disabled={key==="rental_date"}
-                            />
+                            />}
                           </div>:
                          null
                         ))}
