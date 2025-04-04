@@ -24,7 +24,7 @@ export default function RentedBooks() {
   useEffect(() => {
     const fetchingInfo = async () => {
       try {
-        const response = await fetch("https://the-book-heaven-jkie.onrender.com/rentedDetails", {
+        const response = await fetch("https://the-book-heaven-2lp4.onrender.com/rentedDetails", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -49,7 +49,7 @@ export default function RentedBooks() {
 
   const handleSave = async (entry) => {
     try {
-      const response = await fetch(`https://the-book-heaven-jkie.onrender.com/rentedDetails/${entry.user_id}`, {
+      const response = await fetch(`https://the-book-heaven-2lp4.onrender.com/rentedDetails/${entry.user_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

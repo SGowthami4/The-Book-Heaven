@@ -29,7 +29,7 @@ export default function Register({setNewUser}) {
     }
    setLoading(true);
     try {
-      const response = await fetch("https://the-book-heaven-jkie.onrender.com/register", {
+      const response = await fetch("https://the-book-heaven-2lp4.onrender.com/register", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

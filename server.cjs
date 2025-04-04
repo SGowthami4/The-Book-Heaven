@@ -112,7 +112,7 @@ app.post("/register", async (req, res) => {
             <td style="text-align: center;">
               <h1 style="color: #333; font-size: 20px;">Book Heaven Verification Mail</h1>
               <p style="font-size: 16px; color: #555;">To verify, click the button below:</p>
-              <a href="https://the-book-heaven-jkie.onrender.com/verify/${token}" 
+              <a href="https://the-book-heaven-2lp4.onrender.com/verify/${token}" 
                  style="display: inline-block; padding: 10px 20px; color: white; background-color: #007BFF; text-decoration: none; font-size: 16px; border-radius: 5px;">
                 Verify Email
               </a>

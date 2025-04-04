@@ -12,7 +12,7 @@ export default function Books() {
   useEffect(()=>{
     const fetchedBooks=async()=>{
       try{
-        const response=await fetch("https://the-book-heaven-jkie.onrender.com/books",{
+        const response=await fetch("https://the-book-heaven-2lp4.onrender.com/books",{
           method:"GET",
           headers:{
             Authorization:`Bearer ${localStorage.getItem('authToken')}`,

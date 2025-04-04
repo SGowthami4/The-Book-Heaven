@@ -11,7 +11,7 @@ export default function UsersDetails({newUser,setNewUser }) {
   useEffect(()=>{
     const fetchData = async () => {
       try {
-        const response = await fetch("https://the-book-heaven-jkie.onrender.com/getAllUsers", {
+        const response = await fetch("https://the-book-heaven-2lp4.onrender.com/getAllUsers", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("authToken")}`,
