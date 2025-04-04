@@ -6,7 +6,7 @@ import { Table,TableBody,TableHeader,TableRow,TableCell,TableHead,TableCaption }
 import { Label } from './components/ui/label';
 import { Input } from './components/ui/input';
 import {useNavigate} from 'react-router-dom'
-import { Select } from '@radix-ui/react-select';
+import { Select,SelectTrigger,SelectContent,SelectGroup,SelectItem,SelectValue } from '@radix-ui/react-select';
 export default function RentedBooks() {
   const [rentedInfo, setRentedInfo] = useState([]);
   const [updateDetails, setUpdateDetails] = useState({
