@@ -135,9 +135,10 @@ export default function RentedBooks() {
                           <Label htmlFor={key}>{key.replace('_', ' ')}</Label>
                           {key=='returned'? <Select
                         value={updateDetails[key] || entry[key] || ''}
-                        onValueChange={(e) =>
-                          setUpdateDetails((prev) => ({ ...prev, [key]: e.target.value }))
+                        onValueChange={(value) =>
+                          setUpdateDetails((prev) => ({ ...prev, [key]: value }))
                         }
+                        
                         id={key}
                 >
                   <SelectTrigger>
